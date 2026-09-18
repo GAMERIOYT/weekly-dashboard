@@ -41,6 +41,7 @@
             overflow: hidden;
         }
 
+        /* Background Effects */
         .cosmos {
             position: fixed;
             inset: 0;
@@ -167,7 +168,7 @@
             color: var(--muted);
         }
 
-        input[type="text"] {
+        input[type="text"], input[type="datetime-local"] {
             width: 100%;
             padding: 10px 12px;
             margin-bottom: 10px;
@@ -176,13 +177,15 @@
             background: rgba(7, 3, 18, 0.65);
             color: var(--text-color);
             outline: none;
+            font-family: inherit;
         }
 
-        input[type="text"]:focus {
+        input[type="text"]:focus, input[type="datetime-local"]:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.25);
         }
 
+        /* Color Picker fix */
         input[type="color"] {
             width: 100%;
             height: 38px;
@@ -212,6 +215,17 @@
         button:hover {
             filter: brightness(1.08);
             transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 1px solid var(--muted);
+            color: var(--text-color);
+            box-shadow: none;
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         #external-events {
@@ -270,6 +284,58 @@
             height: 100%;
         }
 
+        /* CUSTOM MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--sidebar-bg);
+            width: 400px;
+            max-width: 90%;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+            transform: translateY(20px);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .time-inputs > div {
+            flex: 1;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* FullCalendar Overrides */
         .fc {
             --fc-page-bg-color: transparent;
             --fc-neutral-bg-color: rgba(255,255,255,0.04);
@@ -330,6 +396,7 @@
             font-weight: 600;
         }
 
+        /* Scrollbars */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -344,6 +411,31 @@
         <div class="stars"></div>
         <div class="stars2"></div>
         <div class="stars3"></div>
+    </div>
+
+    <!-- CUSTOM EVENT MODAL -->
+    <div id="event-modal" class="modal-overlay">
+        <div class="modal-content control-group">
+            <h3>Create New Event</h3>
+            <label for="event-title-input">Event Title</label>
+            <input type="text" id="event-title-input" placeholder="e.g., Team Sync, Deep Work" autocomplete="off">
+            
+            <div class="time-inputs">
+                <div>
+                    <label for="event-start-input">Start</label>
+                    <input type="datetime-local" id="event-start-input">
+                </div>
+                <div>
+                    <label for="event-end-input">End</label>
+                    <input type="datetime-local" id="event-end-input">
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="save-event-btn">Save Event</button>
+                <button id="cancel-event-btn" class="secondary">Cancel</button>
+            </div>
+        </div>
     </div>
 
     <div id="sidebar">
@@ -399,6 +491,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const root = document.documentElement;
             
+            // Theme Pickers
             document.getElementById('theme-primary').addEventListener('input', (e) => {
                 root.style.setProperty('--primary-color', e.target.value);
             });
@@ -413,6 +506,7 @@
                 });
             });
 
+            // Draggables
             const containerEl = document.getElementById('external-events');
             const checkbox = document.getElementById('drop-remove');
 
@@ -440,6 +534,54 @@
                 }
             });
 
+            // Helper to format dates for the datetime-local input
+            function formatForInput(dateObj) {
+                // Adjusts for local timezone cleanly
+                const d = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
+                return d.toISOString().slice(0, 16);
+            }
+
+            // Modal Elements
+            const modal = document.getElementById('event-modal');
+            const titleInput = document.getElementById('event-title-input');
+            const startInput = document.getElementById('event-start-input');
+            const endInput = document.getElementById('event-end-input');
+            const saveBtn = document.getElementById('save-event-btn');
+            const cancelBtn = document.getElementById('cancel-event-btn');
+
+            let currentSelectionInfo = null; // Stores calendar selection data
+
+            function closeModal() {
+                modal.classList.remove('active');
+                titleInput.value = '';
+                calendar.unselect();
+            }
+
+            cancelBtn.addEventListener('click', closeModal);
+
+            saveBtn.addEventListener('click', () => {
+                const title = titleInput.value.trim();
+                if (title && currentSelectionInfo) {
+                    calendar.addEvent({
+                        title: title,
+                        start: startInput.value,
+                        end: endInput.value,
+                        allDay: currentSelectionInfo.allDay,
+                        backgroundColor: document.getElementById('theme-event').value
+                    });
+                    closeModal();
+                } else if (!title) {
+                    titleInput.focus(); // prompt user to enter title
+                }
+            });
+
+            // Close modal if clicking on the background overlay
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+
+            // Initialize FullCalendar
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
@@ -458,17 +600,25 @@
                     }
                 },
                 select: function(info) {
-                    const title = prompt('Enter Event Title:');
-                    if (title) {
-                        calendar.addEvent({
-                            title: title,
-                            start: info.startStr,
-                            end: info.endStr,
-                            allDay: info.allDay,
-                            backgroundColor: document.getElementById('theme-event').value
-                        });
+                    // Save info to use later when they click "Save"
+                    currentSelectionInfo = info;
+                    
+                    // Pre-fill the start and end times in the modal
+                    startInput.value = formatForInput(info.start);
+                    
+                    // If they just click a time without dragging, FullCalendar sometimes omits end time
+                    if (info.end) {
+                        endInput.value = formatForInput(info.end);
+                    } else {
+                        // Default to 1 hour later if no end time
+                        const end = new Date(info.start);
+                        end.setHours(end.getHours() + 1);
+                        endInput.value = formatForInput(end);
                     }
-                    calendar.unselect();
+
+                    // Open the modal
+                    modal.classList.add('active');
+                    setTimeout(() => titleInput.focus(), 100); 
                 },
                 eventClick: function(info) {
                     if (confirm(`Do you want to delete the event '${info.event.title}'?`)) {
@@ -479,6 +629,7 @@
             
             calendar.render();
 
+            // Notifications logic...
             let notificationsEnabled = false;
 
             document.getElementById('enable-notif-btn').addEventListener('click', () => {
