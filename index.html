@@ -13,396 +13,162 @@
     <style>
         :root {
             --bg-color: #070312;
-            --sidebar-bg: rgba(12, 8, 32, 0.72);
+            --sidebar-bg: rgba(12, 8, 32, 0.85);
             --text-color: #e8e4ff;
             --muted: #a39bc8;
             --primary-color: #7c5cff;
             --event-color: #3ecfff;
             --glass-border: rgba(180, 160, 255, 0.22);
             --glow: 0 0 24px rgba(124, 92, 255, 0.45);
+            --star-speed: 80s;
         }
 
-        * {
-            box-sizing: border-box;
+        [data-theme="supernova"] {
+            --bg-color: #1a0505; --sidebar-bg: rgba(32, 8, 8, 0.85);
+            --text-color: #ffe8e8; --muted: #c89b9b;
+            --primary-color: #ff5c5c; --event-color: #ffb13e;
+            --glass-border: rgba(255, 160, 160, 0.22); --glow: 0 0 24px rgba(255, 92, 92, 0.45);
         }
 
-        html, body {
-            height: 100%;
+        [data-theme="cyberpunk"] {
+            --bg-color: #051a0f; --sidebar-bg: rgba(8, 32, 16, 0.85);
+            --text-color: #e8ffe8; --muted: #9bc8a3;
+            --primary-color: #00ff88; --event-color: #00e5ff;
+            --glass-border: rgba(160, 255, 180, 0.22); --glow: 0 0 24px rgba(0, 255, 136, 0.45);
         }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            height: 100vh;
-            color: var(--text-color);
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-color);
-            overflow: hidden;
+            display: flex; color: var(--text-color); font-family: 'Outfit', sans-serif;
+            background: var(--bg-color); overflow: hidden; transition: background 0.5s ease;
         }
+
+        /* Mobile Header */
+        #mobile-header {
+            display: none; position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            background: var(--sidebar-bg); backdrop-filter: blur(10px); z-index: 100;
+            align-items: center; justify-content: space-between; padding: 0 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        #mobile-header h2 { font-size: 18px; margin: 0; }
+        #menu-toggle { background: transparent; box-shadow: none; width: auto; padding: 5px; color: var(--text-color); font-size: 24px; }
 
         /* Background Effects */
-        .cosmos {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background:
-                radial-gradient(1200px 700px at 12% 18%, rgba(124, 92, 255, 0.35), transparent 55%),
-                radial-gradient(900px 600px at 88% 8%, rgba(62, 207, 255, 0.22), transparent 50%),
-                radial-gradient(800px 700px at 72% 92%, rgba(255, 80, 170, 0.18), transparent 52%),
-                radial-gradient(circle at 50% 50%, #160a32 0%, #070312 68%);
-        }
-
-        .stars, .stars2, .stars3 {
-            position: absolute;
-            inset: 0;
-            background-repeat: repeat;
-        }
-
+        .cosmos { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .stars, .stars2 { position: absolute; inset: 0; background-repeat: repeat; }
         .stars {
-            background-image: radial-gradient(1px 1px at 20px 30px, #fff, transparent),
-                              radial-gradient(1px 1px at 80px 120px, #fff, transparent),
-                              radial-gradient(1.5px 1.5px at 160px 70px, #dce7ff, transparent),
-                              radial-gradient(1px 1px at 240px 200px, #fff, transparent),
-                              radial-gradient(1px 1px at 300px 40px, #c9b6ff, transparent);
-            background-size: 340px 240px;
-            animation: drift 80s linear infinite;
-            opacity: 0.85;
+            background-image: radial-gradient(1px 1px at 20px 30px, #fff, transparent), radial-gradient(1.5px 1.5px at 160px 70px, rgba(255,255,255,0.8), transparent), radial-gradient(1px 1px at 300px 40px, var(--primary-color), transparent);
+            background-size: 340px 240px; animation: drift var(--star-speed) linear infinite; opacity: 0.85;
         }
-
         .stars2 {
-            background-image: radial-gradient(1.5px 1.5px at 50px 90px, #fff, transparent),
-                              radial-gradient(2px 2px at 180px 40px, #9be7ff, transparent),
-                              radial-gradient(1px 1px at 270px 160px, #fff, transparent);
-            background-size: 420px 280px;
-            animation: drift 140s linear infinite reverse;
-            opacity: 0.6;
+            background-image: radial-gradient(1.5px 1.5px at 50px 90px, #fff, transparent), radial-gradient(2px 2px at 180px 40px, var(--event-color), transparent);
+            background-size: 420px 280px; animation: drift calc(var(--star-speed) * 1.75) linear infinite reverse; opacity: 0.6;
         }
+        @keyframes drift { from { background-position: 0 0; } to { background-position: 340px 240px; } }
 
-        .stars3 {
-            background-image: radial-gradient(2px 2px at 100px 20px, rgba(255,255,255,0.9), transparent),
-                              radial-gradient(1px 1px at 220px 140px, rgba(255,210,255,0.8), transparent);
-            background-size: 500px 360px;
-            animation: twinkle 4s ease-in-out infinite alternate;
-            opacity: 0.5;
-        }
-
-        @keyframes drift {
-            from { background-position: 0 0; }
-            to { background-position: 340px 240px; }
-        }
-
-        @keyframes twinkle {
-            from { opacity: 0.25; }
-            to { opacity: 0.7; }
-        }
-
-        #sidebar,
-        #calendar-container {
-            position: relative;
-            z-index: 1;
-        }
-
+        /* Sidebar */
         #sidebar {
-            width: 330px;
-            min-width: 280px;
-            background: var(--sidebar-bg);
-            backdrop-filter: blur(22px);
-            -webkit-backdrop-filter: blur(22px);
-            border-right: 1px solid var(--glass-border);
-            padding: 24px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            overflow-y: auto;
-            box-shadow: 12px 0 40px rgba(0, 0, 0, 0.35);
+            width: 330px; min-width: 280px; background: var(--sidebar-bg);
+            backdrop-filter: blur(22px); border-right: 1px solid var(--glass-border);
+            padding: 24px 20px; display: flex; flex-direction: column; gap: 18px;
+            overflow-y: auto; box-shadow: 12px 0 40px rgba(0, 0, 0, 0.35); z-index: 10; transition: transform 0.3s ease;
         }
 
-        .brand {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding-bottom: 6px;
+        .brand span { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--event-color); }
+        h2 { margin: 0; font-family: 'Orbitron', sans-serif; font-size: 22px; background: linear-gradient(90deg, #fff, var(--primary-color) 45%, var(--event-color)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        h3 { margin: 0 0 12px; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+
+        .control-group { background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); padding: 16px; border-radius: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 13px; color: var(--muted); }
+
+        input[type="text"], input[type="date"], textarea, select {
+            width: 100%; padding: 10px 12px; margin-bottom: 10px; border: 1px solid var(--glass-border);
+            border-radius: 10px; background: rgba(0, 0, 0, 0.4); color: var(--text-color); outline: none; font-family: inherit;
+        }
+        textarea { resize: vertical; min-height: 70px; }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.25); }
+
+        .color-picker-group { display: flex; gap: 12px; margin-bottom: 10px; }
+        .color-picker-item { flex: 1; text-align: center; }
+        .color-picker-item input[type="color"] {
+            width: 100%; height: 38px; border: 1px solid var(--glass-border); border-radius: 8px;
+            background: transparent; cursor: pointer; padding: 2px;
         }
 
-        .brand span {
-            font-size: 11px;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            color: #9be7ff;
-        }
-
-        h2 {
-            margin: 0;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 22px;
-            letter-spacing: 0.04em;
-            background: linear-gradient(90deg, #fff, #c9b6ff 45%, #3ecfff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        h3 {
-            margin: 0 0 12px;
-            font-size: 13px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: #c9b6ff;
-        }
-
-        .control-group {
-            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
-            border: 1px solid var(--glass-border);
-            padding: 16px;
-            border-radius: 16px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        input[type="text"], input[type="datetime-local"] {
-            width: 100%;
-            padding: 10px 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            background: rgba(7, 3, 18, 0.65);
-            color: var(--text-color);
-            outline: none;
-            font-family: inherit;
-        }
-
-        input[type="text"]:focus, input[type="datetime-local"]:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.25);
-        }
-
-        /* Color Picker fix */
-        input[type="color"] {
-            width: 100%;
-            height: 38px;
-            margin-bottom: 10px;
-            padding: 3px;
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            background: rgba(7, 3, 18, 0.65);
-            cursor: pointer;
-        }
-
+        /* Buttons */
         button {
-            background: linear-gradient(135deg, var(--primary-color), #3ecfff);
-            color: #0b0418;
-            border: none;
-            padding: 11px;
-            width: 100%;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 700;
-            font-family: inherit;
-            letter-spacing: 0.02em;
-            box-shadow: var(--glow);
-            transition: transform 0.15s ease, filter 0.15s ease;
+            background: linear-gradient(135deg, var(--primary-color), var(--event-color)); color: #0b0418;
+            border: none; padding: 11px; width: 100%; border-radius: 12px; cursor: pointer; font-weight: 700;
+            font-family: inherit; transition: transform 0.1s ease, filter 0.15s ease;
         }
+        button:active { transform: scale(0.96); }
+        button:hover { filter: brightness(1.1); }
+        button.secondary { background: transparent; border: 1px solid var(--muted); color: var(--text-color); }
+        button.danger { background: transparent; border: 1px solid #ff5c5c; color: #ff5c5c; }
+        button.danger:hover { background: rgba(255, 92, 92, 0.1); }
+        button.icon-btn { display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-        button:hover {
-            filter: brightness(1.08);
-            transform: translateY(-1px);
+        /* Draggables */
+        #external-events .fc-event {
+            background: linear-gradient(135deg, var(--event-color), var(--primary-color)) !important;
+            color: #07101c !important; padding: 9px; margin-bottom: 8px; border-radius: 10px !important;
+            cursor: grab; text-align: center; border: none !important; font-weight: 600;
         }
+        .hint { font-size: 12px; color: var(--muted); margin: 10px 0 0; display: flex; align-items: center; gap: 8px; }
 
-        button.secondary {
-            background: transparent;
-            border: 1px solid var(--muted);
-            color: var(--text-color);
-            box-shadow: none;
-        }
-
-        button.secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        #external-events {
-            margin-top: 6px;
-        }
-
-        .fc-event {
-            background: linear-gradient(135deg, var(--event-color), #7c5cff) !important;
-            color: #07101c !important;
-            padding: 9px;
-            margin-bottom: 8px;
-            border-radius: 10px !important;
-            cursor: grab;
-            text-align: center;
-            border: none !important;
-            font-weight: 600;
-            box-shadow: 0 0 16px rgba(62, 207, 255, 0.28);
-        }
-
-        .hint {
-            font-size: 12px;
-            color: var(--muted);
-            margin: 10px 0 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .hint label {
-            display: inline;
-            margin: 0;
-            font-weight: 400;
-            color: var(--muted);
-        }
-
-        #enable-notif-btn {
-            background: linear-gradient(135deg, #ff5fb1, #ffb347);
-            box-shadow: 0 0 20px rgba(255, 95, 177, 0.35);
-        }
-
-        #calendar-container {
-            flex-grow: 1;
-            padding: 22px;
-            overflow: hidden;
-            min-width: 0;
-        }
-
+        /* Calendar Layout */
+        #calendar-container { flex-grow: 1; padding: 22px; overflow: hidden; min-width: 0; z-index: 1; }
         #calendar {
-            background: rgba(10, 6, 28, 0.62);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            padding: 18px;
-            border-radius: 22px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.08);
-            height: 100%;
+            background: rgba(10, 6, 28, 0.4); backdrop-filter: blur(18px); padding: 18px; border-radius: 22px;
+            border: 1px solid var(--glass-border); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); height: 100%;
         }
 
-        /* CUSTOM MODAL STYLES */
+        /* Modals */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(6px);
-            z-index: 1000;
-            display: none; /* Hidden by default */
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.2s ease;
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px);
+            z-index: 1000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease;
         }
-
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-
+        .modal-overlay.active { display: flex; opacity: 1; }
         .modal-content {
-            background: var(--sidebar-bg);
-            width: 400px;
-            max-width: 90%;
-            padding: 24px;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-            transform: translateY(20px);
-            transition: transform 0.2s ease;
+            background: var(--sidebar-bg); width: 480px; max-width: 92%; padding: 24px; border-radius: 18px;
+            border: 1px solid var(--glass-border); box-shadow: 0 24px 80px rgba(0,0,0,0.8); transform: translateY(20px); transition: transform 0.2s ease;
+            max-height: 88vh; overflow-y: auto;
         }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
 
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-        }
+        .time-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .time-row > * { flex: 1; margin-bottom: 0; }
 
-        .time-inputs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
+        .field-icon-group { position: relative; }
+        .field-icon-group input, .field-icon-group textarea, .field-icon-group select { padding-left: 34px; }
+        .field-icon-group .icon { position: absolute; left: 10px; top: 12px; opacity: 0.7; font-size: 14px; pointer-events: none; }
 
-        .time-inputs > div {
-            flex: 1;
-        }
+        /* FullCalendar GCal Styling Overrides */
+        .fc { --fc-page-bg-color: transparent; --fc-border-color: rgba(255, 255, 255, 0.08); --fc-now-indicator-color: var(--primary-color); --fc-page-text-color: var(--text-color); }
+        .fc-theme-standard td, .fc-theme-standard th { border-color: var(--glass-border); }
+        .fc .fc-toolbar-title { font-family: 'Orbitron', sans-serif; font-size: 1.25rem; color: var(--text-color); }
+        .fc .fc-button-primary { background: rgba(255,255,255,0.1) !important; border: 1px solid var(--glass-border) !important; border-radius: 10px !important; text-transform: capitalize; }
+        .fc .fc-button-primary:hover { background: var(--primary-color) !important; color: #000 !important; }
+        
+        .fc-event { border: none !important; border-radius: 6px !important; overflow: hidden; font-size: 0.85em; }
+        .fc-v-event { background: rgba(124, 92, 255, 0.22) !important; border-left: 4px solid var(--primary-color) !important; color: var(--text-color) !important; }
+        .fc-daygrid-event { background: var(--primary-color) !important; color: #000 !important; padding: 2px 4px; font-weight: 500; }
+        .fc-v-event .fc-event-main { padding: 4px 6px; display: flex; flex-direction: column; gap: 2px; }
+        .fc-event-time { font-weight: 400; opacity: 0.85; font-size: 0.85em; }
+        .fc-event-title { font-weight: 600; }
+        .event-extra-info { font-size: 0.75em; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        /* FullCalendar Overrides */
-        .fc {
-            --fc-page-bg-color: transparent;
-            --fc-neutral-bg-color: rgba(255,255,255,0.04);
-            --fc-border-color: rgba(180, 160, 255, 0.16);
-            --fc-today-bg-color: rgba(124, 92, 255, 0.16);
-            --fc-now-indicator-color: #ff5fb1;
-            --fc-page-text-color: var(--text-color);
-            --fc-neutral-text-color: var(--muted);
-            --fc-small-font-size: 0.85em;
-        }
-
-        .fc, .fc table, .fc th, .fc td, .fc a {
-            color: var(--text-color);
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .fc-theme-standard .fc-scrollgrid,
-        .fc-theme-standard td,
-        .fc-theme-standard th {
-            border-color: rgba(180, 160, 255, 0.16);
-        }
-
-        .fc .fc-col-header-cell-cushion,
-        .fc .fc-timegrid-slot-label-cushion,
-        .fc .fc-toolbar-title {
-            color: #f3efff;
-        }
-
-        .fc .fc-toolbar-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.25rem;
-            letter-spacing: 0.04em;
-        }
-
-        .fc .fc-button-primary {
-            background: rgba(124, 92, 255, 0.22) !important;
-            border: 1px solid rgba(180, 160, 255, 0.35) !important;
-            color: #f3efff !important;
-            text-transform: capitalize;
-            box-shadow: none !important;
-            border-radius: 10px !important;
-        }
-
-        .fc .fc-button-primary:not(:disabled).fc-button-active,
-        .fc .fc-button-primary:hover {
-            background: linear-gradient(135deg, var(--primary-color), #3ecfff) !important;
-            color: #0b0418 !important;
-            border-color: transparent !important;
-        }
-
-        .fc .fc-timegrid-col.fc-day-today,
-        .fc .fc-daygrid-day.fc-day-today {
-            background: rgba(124, 92, 255, 0.12);
-        }
-
-        .fc-event .fc-event-main {
-            color: #07101c;
-            font-weight: 600;
-        }
-
-        /* Scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(180, 160, 255, 0.35);
-            border-radius: 8px;
+        @media (max-width: 850px) {
+            body { flex-direction: column; }
+            #mobile-header { display: flex; }
+            #sidebar { position: fixed; top: 60px; left: 0; bottom: 0; width: 100%; max-width: 350px; transform: translateX(-100%); border-right: 1px solid var(--glass-border); }
+            #sidebar.open { transform: translateX(0); }
+            #calendar-container { padding-top: 70px; padding-inline: 10px; }
+            .fc .fc-toolbar { flex-direction: column; gap: 10px; }
+            .time-row { flex-direction: column; gap: 6px; }
         }
     </style>
 </head>
@@ -410,258 +176,495 @@
     <div class="cosmos" aria-hidden="true">
         <div class="stars"></div>
         <div class="stars2"></div>
-        <div class="stars3"></div>
     </div>
 
-    <!-- CUSTOM EVENT MODAL -->
+    <!-- Mobile Header -->
+    <div id="mobile-header">
+        <h2>Nebula</h2>
+        <button id="menu-toggle">☰</button>
+    </div>
+
+    <!-- Google Calendar Style Event Editor Modal -->
     <div id="event-modal" class="modal-overlay">
         <div class="modal-content control-group">
-            <h3>Create New Event</h3>
-            <label for="event-title-input">Event Title</label>
-            <input type="text" id="event-title-input" placeholder="e.g., Team Sync, Deep Work" autocomplete="off">
+            <h3 id="modal-title">Create Event</h3>
             
-            <div class="time-inputs">
-                <div>
-                    <label for="event-start-input">Start</label>
-                    <input type="datetime-local" id="event-start-input">
-                </div>
-                <div>
-                    <label for="event-end-input">End</label>
-                    <input type="datetime-local" id="event-end-input">
-                </div>
+            <label>Event Title</label>
+            <input type="text" id="event-title-input" placeholder="Add title..." autocomplete="off">
+            
+            <label>Event Category</label>
+            <div class="field-icon-group">
+                <span class="icon">🏷️</span>
+                <select id="event-category-input">
+                    <option value="Meeting">Meeting 👥</option>
+                    <option value="Focus Work">Focus Work 🧠</option>
+                    <option value="Personal">Personal 🏠</option>
+                    <option value="Reminder">Reminder ⏰</option>
+                </select>
             </div>
-            
+
+            <label>Date & Time</label>
+            <div class="time-row">
+                <input type="date" id="event-start-date">
+                <select id="event-start-time" class="time-select"></select>
+            </div>
+            <div class="time-row">
+                <input type="date" id="event-end-date">
+                <select id="event-end-time" class="time-select"></select>
+            </div>
+
+            <label>Location</label>
+            <div class="field-icon-group">
+                <span class="icon">📍</span>
+                <input type="text" id="event-location-input" placeholder="Add location or Google Meet link...">
+            </div>
+
+            <label>Guests / Members</label>
+            <div class="field-icon-group">
+                <span class="icon">👤</span>
+                <input type="text" id="event-guests-input" placeholder="Add guests (e.g. alex@orbit.io, sarah)...">
+            </div>
+
+            <label>Description / Notes</label>
+            <div class="field-icon-group">
+                <span class="icon">📝</span>
+                <textarea id="event-desc-input" placeholder="Add agenda, meeting notes, or details..."></textarea>
+            </div>
+
             <div class="modal-actions">
                 <button id="save-event-btn">Save Event</button>
+                <button id="delete-event-btn" class="danger" style="display: none;">Delete</button>
                 <button id="cancel-event-btn" class="secondary">Cancel</button>
             </div>
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay">
+        <div class="modal-content control-group">
+            <h3>Nebula Customization</h3>
+            
+            <label>Theme Preset</label>
+            <select id="setting-theme">
+                <option value="nebula">Nebula (Deep Purple)</option>
+                <option value="supernova">Supernova (Solar Flare)</option>
+                <option value="cyberpunk">Cyberpunk (Neon Green)</option>
+                <option value="custom">Custom Gradient</option>
+            </select>
+
+            <div id="custom-gradient-container" style="display: none;">
+                <label>Custom Theme Gradient</label>
+                <div class="color-picker-group">
+                    <div class="color-picker-item">
+                        <label>Primary</label>
+                        <input type="color" id="custom-color-primary" value="#7c5cff">
+                    </div>
+                    <div class="color-picker-item">
+                        <label>Secondary</label>
+                        <input type="color" id="custom-color-secondary" value="#3ecfff">
+                    </div>
+                </div>
+            </div>
+
+            <label>Time Format</label>
+            <select id="setting-time">
+                <option value="h:mm A">12 Hour (1:00 PM)</option>
+                <option value="HH:mm">24 Hour (13:00)</option>
+            </select>
+
+            <label>First Day of Week</label>
+            <select id="setting-first-day">
+                <option value="0">Sunday</option>
+                <option value="1">Monday</option>
+            </select>
+
+            <label>Star Animation Speed</label>
+            <select id="setting-speed">
+                <option value="120s">Relaxed (Slow)</option>
+                <option value="80s">Standard</option>
+                <option value="30s">Hyperdrive (Fast)</option>
+            </select>
+
+            <div class="modal-actions">
+                <button id="save-settings-btn">Apply Settings</button>
+                <button id="cancel-settings-btn" class="secondary">Close</button>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
+            <button id="clear-data-btn" class="danger">Reset All Local Data</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
     <div id="sidebar">
         <div class="brand">
             <span>Mission control</span>
-            <h2>Nebula Calendar</h2>
+            <h2>Nebula Cal</h2>
         </div>
         
-        <div class="control-group">
-            <h3>Create Draggable Block</h3>
-            <label for="block-title">Event Title</label>
-            <input type="text" id="block-title" placeholder="e.g., Orbit sync, Deep work">
-            <button id="add-block-btn">Add to Draggables</button>
-        </div>
+        <button id="open-settings-btn" class="secondary icon-btn">⚙️ Customization Settings</button>
 
         <div class="control-group">
-            <h3>Drag into Calendar</h3>
-            <div id="external-events">
-                <div class="fc-event" data-title="Lunch Break">Lunch Break</div>
-                <div class="fc-event" data-title="Deep Work">Deep Work</div>
-                <div class="fc-event" data-title="Review">Review</div>
-            </div>
+            <h3>Draggable Blocks</h3>
+            <input type="text" id="block-title" placeholder="Add new block...">
+            <button id="add-block-btn" style="margin-bottom: 12px;">Add Block</button>
+            <div id="external-events"></div>
             <p class="hint">
-                <input type="checkbox" id="drop-remove">
-                <label for="drop-remove">Remove after drop</label>
+                <input type="checkbox" id="drop-remove"> <label for="drop-remove">Remove after drop</label>
             </p>
         </div>
 
         <div class="control-group">
-            <h3>Customization</h3>
-            <label for="theme-primary">Primary Color</label>
-            <input type="color" id="theme-primary" value="#7c5cff">
-            
-            <label for="theme-bg">Background Color</label>
-            <input type="color" id="theme-bg" value="#070312">
-
-            <label for="theme-event">Default Event Color</label>
-            <input type="color" id="theme-event" value="#3ecfff">
-        </div>
-
-        <div class="control-group">
             <h3>Notifications</h3>
-            <button id="enable-notif-btn">Enable Notifications</button>
-            <p class="hint">You will be notified 1 minute before an event starts.</p>
+            <button id="enable-notif-btn" class="secondary">Enable Alerts</button>
+            <p class="hint">Notifies you 1 min before events.</p>
         </div>
     </div>
 
+    <!-- Calendar View -->
     <div id="calendar-container">
         <div id="calendar"></div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const root = document.documentElement;
-            
-            // Theme Pickers
-            document.getElementById('theme-primary').addEventListener('input', (e) => {
-                root.style.setProperty('--primary-color', e.target.value);
-            });
-            document.getElementById('theme-bg').addEventListener('input', (e) => {
-                root.style.setProperty('--bg-color', e.target.value);
-                document.body.style.background = e.target.value;
-            });
-            document.getElementById('theme-event').addEventListener('input', (e) => {
-                root.style.setProperty('--event-color', e.target.value);
-                document.querySelectorAll('#external-events .fc-event').forEach(el => {
-                    el.style.background = e.target.value;
+            // Audio Engine
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            let audioCtx = null;
+            function playSound(type) {
+                if (!audioCtx) audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                    gainNode.gain.setValueAtTime(0.1, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now); osc.stop(now + 0.05);
+                } else if (type === 'save') {
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.05);
+                    gainNode.gain.setValueAtTime(0.15, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                } else if (type === 'delete') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                    gainNode.gain.setValueAtTime(0.15, now); gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                }
+            }
+            document.querySelectorAll('button').forEach(btn => btn.addEventListener('mousedown', () => playSound('click')));
+
+            // Mobile Navigation
+            const sidebar = document.getElementById('sidebar');
+            document.getElementById('menu-toggle').addEventListener('click', () => sidebar.classList.toggle('open'));
+            document.getElementById('calendar-container').addEventListener('click', () => { if (window.innerWidth <= 850) sidebar.classList.remove('open'); });
+
+            // Populate Time Dropdown Options (15-min intervals)
+            function populateTimeDropdowns() {
+                const selects = document.querySelectorAll('.time-select');
+                selects.forEach(select => {
+                    select.innerHTML = '';
+                    for (let h = 0; h < 24; h++) {
+                        for (let m = 0; m < 60; m += 15) {
+                            const hh = String(h).padStart(2, '0');
+                            const mm = String(m).padStart(2, '0');
+                            const timeVal = `${hh}:${mm}`;
+                            
+                            // Format display text according to preferences
+                            const period = h >= 12 ? 'PM' : 'AM';
+                            const h12 = h % 12 || 12;
+                            const display12 = `${h12}:${mm} ${period}`;
+                            const display24 = timeVal;
+                            
+                            const opt = document.createElement('option');
+                            opt.value = timeVal;
+                            opt.innerText = PREFS.timeFormat.includes('A') ? display12 : display24;
+                            select.appendChild(opt);
+                        }
+                    }
                 });
+            }
+
+            // User Preferences & Settings
+            const PREFS = JSON.parse(localStorage.getItem('nebula_prefs')) || {
+                theme: 'nebula',
+                customPrimary: '#7c5cff',
+                customSecondary: '#3ecfff',
+                timeFormat: 'h:mm A',
+                firstDay: '0',
+                speed: '80s'
+            };
+
+            function applySettings() {
+                document.body.setAttribute('data-theme', PREFS.theme);
+                document.documentElement.style.setProperty('--star-speed', PREFS.speed);
+                
+                if (PREFS.theme === 'custom') {
+                    document.documentElement.style.setProperty('--primary-color', PREFS.customPrimary);
+                    document.documentElement.style.setProperty('--event-color', PREFS.customSecondary);
+                } else {
+                    document.documentElement.style.removeProperty('--primary-color');
+                    document.documentElement.style.removeProperty('--event-color');
+                }
+
+                document.getElementById('setting-theme').value = PREFS.theme;
+                document.getElementById('custom-color-primary').value = PREFS.customPrimary || '#7c5cff';
+                document.getElementById('custom-color-secondary').value = PREFS.customSecondary || '#3ecfff';
+                document.getElementById('setting-time').value = PREFS.timeFormat;
+                document.getElementById('setting-first-day').value = PREFS.firstDay;
+                document.getElementById('setting-speed').value = PREFS.speed;
+
+                const customContainer = document.getElementById('custom-gradient-container');
+                customContainer.style.display = PREFS.theme === 'custom' ? 'block' : 'none';
+
+                populateTimeDropdowns();
+            }
+            applySettings();
+
+            document.getElementById('setting-theme').addEventListener('change', (e) => {
+                document.getElementById('custom-gradient-container').style.display = e.target.value === 'custom' ? 'block' : 'none';
             });
 
             // Draggables
             const containerEl = document.getElementById('external-events');
-            const checkbox = document.getElementById('drop-remove');
-
-            let Draggable = FullCalendar.Draggable;
-            new Draggable(containerEl, {
-                itemSelector: '.fc-event',
-                eventData: function(eventEl) {
-                    return {
-                        title: eventEl.innerText,
-                        backgroundColor: document.getElementById('theme-event').value,
-                        borderColor: document.getElementById('theme-event').value
-                    };
-                }
-            });
+            let savedBlocks = JSON.parse(localStorage.getItem('nebula_blocks')) || ['Deep Work', 'Review', 'Lunch Break'];
+            function renderBlocks() {
+                containerEl.innerHTML = '';
+                savedBlocks.forEach(title => {
+                    const el = document.createElement('div'); el.className = 'fc-event'; el.innerText = title;
+                    containerEl.appendChild(el);
+                });
+            }
+            renderBlocks();
+            new FullCalendar.Draggable(containerEl, { itemSelector: '.fc-event', eventData: (e) => ({ title: e.innerText }) });
 
             document.getElementById('add-block-btn').addEventListener('click', () => {
                 const title = document.getElementById('block-title').value.trim();
-                if (title) {
-                    const el = document.createElement('div');
-                    el.className = 'fc-event';
-                    el.innerText = title;
-                    el.style.background = document.getElementById('theme-event').value;
-                    containerEl.appendChild(el);
-                    document.getElementById('block-title').value = '';
-                }
+                if (title) { savedBlocks.push(title); localStorage.setItem('nebula_blocks', JSON.stringify(savedBlocks)); renderBlocks(); playSound('save'); document.getElementById('block-title').value = ''; }
             });
 
-            // Helper to format dates for the datetime-local input
-            function formatForInput(dateObj) {
-                // Adjusts for local timezone cleanly
-                const d = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
-                return d.toISOString().slice(0, 16);
-            }
+            // Calendar Logic
+            const storedEvents = JSON.parse(localStorage.getItem('nebula_events')) || [];
+            let calendar;
 
-            // Modal Elements
-            const modal = document.getElementById('event-modal');
-            const titleInput = document.getElementById('event-title-input');
-            const startInput = document.getElementById('event-start-input');
-            const endInput = document.getElementById('event-end-input');
-            const saveBtn = document.getElementById('save-event-btn');
-            const cancelBtn = document.getElementById('cancel-event-btn');
+            function initCalendar() {
+                const calendarEl = document.getElementById('calendar');
+                if(calendar) calendar.destroy();
 
-            let currentSelectionInfo = null; // Stores calendar selection data
-
-            function closeModal() {
-                modal.classList.remove('active');
-                titleInput.value = '';
-                calendar.unselect();
-            }
-
-            cancelBtn.addEventListener('click', closeModal);
-
-            saveBtn.addEventListener('click', () => {
-                const title = titleInput.value.trim();
-                if (title && currentSelectionInfo) {
-                    calendar.addEvent({
-                        title: title,
-                        start: startInput.value,
-                        end: endInput.value,
-                        allDay: currentSelectionInfo.allDay,
-                        backgroundColor: document.getElementById('theme-event').value
-                    });
-                    closeModal();
-                } else if (!title) {
-                    titleInput.focus(); // prompt user to enter title
-                }
-            });
-
-            // Close modal if clicking on the background overlay
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-
-
-            // Initialize FullCalendar
-            const calendarEl = document.getElementById('calendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                initialView: 'timeGridWeek',
-                editable: true,
-                droppable: true,
-                selectable: true,
-                nowIndicator: true,
-                drop: function(info) {
-                    if (checkbox.checked) {
-                        info.draggedEl.parentNode.removeChild(info.draggedEl);
-                    }
-                },
-                select: function(info) {
-                    // Save info to use later when they click "Save"
-                    currentSelectionInfo = info;
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+                    initialView: window.innerWidth < 850 ? 'timeGridDay' : 'timeGridWeek',
+                    firstDay: parseInt(PREFS.firstDay),
+                    eventTimeFormat: { 
+                        hour: 'numeric', minute: '2-digit', 
+                        meridiem: PREFS.timeFormat.includes('A') ? 'short' : false, 
+                        hour12: PREFS.timeFormat.includes('A') 
+                    },
+                    events: storedEvents,
+                    editable: true, droppable: true, selectable: true, nowIndicator: true,
+                    eventAdd: saveEvents, eventChange: saveEvents, eventRemove: saveEvents,
                     
-                    // Pre-fill the start and end times in the modal
-                    startInput.value = formatForInput(info.start);
-                    
-                    // If they just click a time without dragging, FullCalendar sometimes omits end time
-                    if (info.end) {
-                        endInput.value = formatForInput(info.end);
-                    } else {
-                        // Default to 1 hour later if no end time
-                        const end = new Date(info.start);
-                        end.setHours(end.getHours() + 1);
-                        endInput.value = formatForInput(end);
-                    }
+                    eventContent: function(arg) {
+                        const props = arg.event.extendedProps;
+                        const mainEl = document.createElement('div');
+                        mainEl.className = 'fc-event-main';
+                        
+                        const timeEl = document.createElement('div');
+                        timeEl.className = 'fc-event-time';
+                        timeEl.innerText = arg.timeText;
+                        
+                        const titleEl = document.createElement('div');
+                        titleEl.className = 'fc-event-title';
+                        titleEl.innerText = arg.event.title;
+                        
+                        mainEl.appendChild(timeEl);
+                        mainEl.appendChild(titleEl);
 
-                    // Open the modal
-                    modal.classList.add('active');
-                    setTimeout(() => titleInput.focus(), 100); 
-                },
-                eventClick: function(info) {
-                    if (confirm(`Do you want to delete the event '${info.event.title}'?`)) {
-                        info.event.remove();
-                    }
-                }
-            });
-            
-            calendar.render();
-
-            // Notifications logic...
-            let notificationsEnabled = false;
-
-            document.getElementById('enable-notif-btn').addEventListener('click', () => {
-                if (!("Notification" in window)) {
-                    alert("This browser does not support desktop notification");
-                } else if (Notification.permission === "granted") {
-                    notificationsEnabled = true;
-                    alert("Notifications are already enabled!");
-                } else if (Notification.permission !== "denied") {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === "granted") {
-                            notificationsEnabled = true;
-                            new Notification("Nebula Calendar", { body: "Notifications successfully enabled!" });
+                        if (props.location) {
+                            const locEl = document.createElement('div');
+                            locEl.className = 'event-extra-info';
+                            locEl.innerText = `📍 ${props.location}`;
+                            mainEl.appendChild(locEl);
                         }
+
+                        return { domNodes: [mainEl] };
+                    },
+
+                    drop: function(info) {
+                        playSound('save');
+                        if (document.getElementById('drop-remove').checked) {
+                            info.draggedEl.remove();
+                            savedBlocks = savedBlocks.filter(b => b !== info.draggedEl.innerText);
+                            localStorage.setItem('nebula_blocks', JSON.stringify(savedBlocks));
+                        }
+                    },
+                    
+                    select: function(info) { openEventModal(null, info); },
+                    eventClick: function(info) { openEventModal(info.event, null); }
+                });
+                calendar.render();
+            }
+            
+            function saveEvents() {
+                const events = calendar.getEvents().map(e => ({
+                    id: e.id,
+                    title: e.title,
+                    start: e.startStr,
+                    end: e.endStr,
+                    allDay: e.allDay,
+                    extendedProps: e.extendedProps
+                }));
+                localStorage.setItem('nebula_events', JSON.stringify(events));
+            }
+            initCalendar();
+
+            // Google-Calendar Style Event Modal Operations
+            const eventModal = document.getElementById('event-modal');
+            let currentEditEvent = null;
+            let currentSelection = null;
+
+            function openEventModal(event = null, selectionInfo = null) {
+                currentEditEvent = event;
+                currentSelection = selectionInfo;
+
+                if (event) {
+                    document.getElementById('modal-title').innerText = 'Edit Event';
+                    document.getElementById('event-title-input').value = event.title;
+                    document.getElementById('event-category-input').value = event.extendedProps.category || 'Meeting';
+                    document.getElementById('event-location-input').value = event.extendedProps.location || '';
+                    document.getElementById('event-guests-input').value = event.extendedProps.guests || '';
+                    document.getElementById('event-desc-input').value = event.extendedProps.description || '';
+
+                    const start = new Date(event.start);
+                    const end = event.end ? new Date(event.end) : new Date(start.getTime() + 3600000);
+
+                    document.getElementById('event-start-date').value = start.toISOString().split('T')[0];
+                    document.getElementById('event-start-time').value = `${String(start.getHours()).padStart(2,'0')}:${String(Math.floor(start.getMinutes()/15)*15).padStart(2,'0')}`;
+                    document.getElementById('event-end-date').value = end.toISOString().split('T')[0];
+                    document.getElementById('event-end-time').value = `${String(end.getHours()).padStart(2,'0')}:${String(Math.floor(end.getMinutes()/15)*15).padStart(2,'0')}`;
+
+                    document.getElementById('delete-event-btn').style.display = 'block';
+                } else {
+                    document.getElementById('modal-title').innerText = 'Create Event';
+                    document.getElementById('event-title-input').value = '';
+                    document.getElementById('event-category-input').value = 'Meeting';
+                    document.getElementById('event-location-input').value = '';
+                    document.getElementById('event-guests-input').value = '';
+                    document.getElementById('event-desc-input').value = '';
+
+                    const start = selectionInfo.start;
+                    let end = selectionInfo.end;
+                    if (!end) { end = new Date(start); end.setHours(end.getHours() + 1); }
+
+                    document.getElementById('event-start-date').value = start.toISOString().split('T')[0];
+                    document.getElementById('event-start-time').value = `${String(start.getHours()).padStart(2,'0')}:${String(Math.floor(start.getMinutes()/15)*15).padStart(2,'0')}`;
+                    document.getElementById('event-end-date').value = end.toISOString().split('T')[0];
+                    document.getElementById('event-end-time').value = `${String(end.getHours()).padStart(2,'0')}:${String(Math.floor(end.getMinutes()/15)*15).padStart(2,'0')}`;
+
+                    document.getElementById('delete-event-btn').style.display = 'none';
+                }
+
+                eventModal.classList.add('active');
+                setTimeout(() => document.getElementById('event-title-input').focus(), 100);
+            }
+
+            function closeEventModal() { eventModal.classList.remove('active'); calendar.unselect(); }
+            document.getElementById('cancel-event-btn').addEventListener('click', closeEventModal);
+            eventModal.addEventListener('click', (e) => { if (e.target === eventModal) closeEventModal(); });
+
+            document.getElementById('save-event-btn').addEventListener('click', () => {
+                const title = document.getElementById('event-title-input').value.trim();
+                if (!title) return document.getElementById('event-title-input').focus();
+
+                const startDate = document.getElementById('event-start-date').value;
+                const startTime = document.getElementById('event-start-time').value;
+                const endDate = document.getElementById('event-end-date').value;
+                const endTime = document.getElementById('event-end-time').value;
+
+                const startISO = `${startDate}T${startTime}:00`;
+                const endISO = `${endDate}T${endTime}:00`;
+
+                const extendedProps = {
+                    category: document.getElementById('event-category-input').value,
+                    location: document.getElementById('event-location-input').value.trim(),
+                    guests: document.getElementById('event-guests-input').value.trim(),
+                    description: document.getElementById('event-desc-input').value.trim()
+                };
+
+                if (currentEditEvent) {
+                    currentEditEvent.setProp('title', title);
+                    currentEditEvent.setDates(startISO, endISO);
+                    currentEditEvent.setExtendedProp('category', extendedProps.category);
+                    currentEditEvent.setExtendedProp('location', extendedProps.location);
+                    currentEditEvent.setExtendedProp('guests', extendedProps.guests);
+                    currentEditEvent.setExtendedProp('description', extendedProps.description);
+                } else {
+                    calendar.addEvent({
+                        id: String(Date.now()),
+                        title: title,
+                        start: startISO,
+                        end: endISO,
+                        allDay: currentSelection ? currentSelection.allDay : false,
+                        extendedProps: extendedProps
+                    });
+                }
+
+                playSound('save');
+                closeEventModal();
+            });
+
+            document.getElementById('delete-event-btn').addEventListener('click', () => {
+                if (currentEditEvent) { currentEditEvent.remove(); playSound('delete'); closeEventModal(); }
+            });
+
+            // Settings Modal Handling
+            const settingsModal = document.getElementById('settings-modal');
+            document.getElementById('open-settings-btn').addEventListener('click', () => settingsModal.classList.add('active'));
+            document.getElementById('cancel-settings-btn').addEventListener('click', () => settingsModal.classList.remove('active'));
+
+            document.getElementById('save-settings-btn').addEventListener('click', () => {
+                PREFS.theme = document.getElementById('setting-theme').value;
+                PREFS.customPrimary = document.getElementById('custom-color-primary').value;
+                PREFS.customSecondary = document.getElementById('custom-color-secondary').value;
+                PREFS.timeFormat = document.getElementById('setting-time').value;
+                PREFS.firstDay = document.getElementById('setting-first-day').value;
+                PREFS.speed = document.getElementById('setting-speed').value;
+
+                localStorage.setItem('nebula_prefs', JSON.stringify(PREFS));
+                applySettings();
+                initCalendar();
+                playSound('save');
+                settingsModal.classList.remove('active');
+            });
+
+            document.getElementById('clear-data-btn').addEventListener('click', () => {
+                if(confirm("Delete ALL saved events, blocks, and settings?")) {
+                    localStorage.clear(); location.reload();
+                }
+            });
+
+            // Notifications
+            let notifEnabled = false;
+            document.getElementById('enable-notif-btn').addEventListener('click', (e) => {
+                if (!("Notification" in window)) return alert("Browser does not support desktop notifications.");
+                if (Notification.permission === "granted") {
+                    notifEnabled = true; e.target.innerText = "Alerts Enabled";
+                    e.target.style.background = "linear-gradient(135deg, #00ff88, #00e5ff)";
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(p => {
+                        if (p === "granted") { notifEnabled = true; e.target.innerText = "Alerts Enabled"; playSound('save'); }
                     });
                 }
             });
 
             setInterval(() => {
-                if (!notificationsEnabled) return;
-
+                if (!notifEnabled) return;
                 const now = new Date();
-                const events = calendar.getEvents();
-
-                events.forEach(event => {
-                    if (event.start) {
-                        const timeDiff = event.start.getTime() - now.getTime();
-                        if (timeDiff > 0 && timeDiff <= 60000) {
-                            new Notification("Event Reminder", {
-                                body: `Your event "${event.title}" is starting in 1 minute!`
-                            });
-                        }
+                calendar.getEvents().forEach(ev => {
+                    if (ev.start && (ev.start.getTime() - now.getTime() > 0) && (ev.start.getTime() - now.getTime() <= 60000)) {
+                        playSound('save');
+                        new Notification("Nebula Cal", { body: `Starting soon: ${ev.title}` });
                     }
                 });
             }, 60000);
